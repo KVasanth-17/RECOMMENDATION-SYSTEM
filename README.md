@@ -1,5 +1,19 @@
 # Movie Recommendation System Using SVD
 
+*COMPANY*: CODTECH IT SOLUTIONS  
+
+*NAME*: VASANTH KANDIBANDA  
+
+*INTERN ID*: CT08DZ1238 
+
+*DOMAIN*: MACHINE LEARNING  
+
+*DURATION*: 8 WEEKS  
+
+*MENTOR*: NEELA SANTOSH  
+
+*DESCRIPTION OF THE TASK*: 
+
 This project implements a **movie recommendation system** using the **Surprise** library’s **SVD (Singular Value Decomposition)** algorithm on the **MovieLens 100k dataset**. The system predicts personalized movie ratings for a given user and recommends top-rated movies the user has not yet watched. It is designed to demonstrate the practical application of collaborative filtering in recommendation systems, combining efficiency with accuracy.
 
 ---
@@ -74,6 +88,6 @@ This project demonstrates a practical application of **collaborative filtering**
 
 This provides a solid foundation for building more advanced recommendation systems and is a useful reference for anyone interested in recommender system development.
 
-
+*OUTPUT*:
 
 <img width="573" height="602" alt="Image" src="https://github.com/user-attachments/assets/e46c1a55-8025-465c-945b-f20ddad3ac91" />
