@@ -91,3 +91,12 @@ This provides a solid foundation for building more advanced recommendation syste
 *OUTPUT*:
 
 <img width="573" height="602" alt="Image" src="https://github.com/user-attachments/assets/e46c1a55-8025-465c-945b-f20ddad3ac91" />
+
+| Rank | Movie Title                       | Item ID | Predicted Rating |
+| ---- | --------------------------------- | ------- | ---------------- |
+| 1    | Star Wars (1977)                  | 50      | 5.0000           |
+| 2    | Raiders of the Lost Ark (1981)    | 258     | 4.9992           |
+| 3    | Contact (1997)                    | 127     | 4.9958           |
+| 4    | Terminator 2: Judgment Day (1991) | 181     | 4.9915           |
+| 5    | Usual Suspects, The (1995)        | 300     | 4.9891           |
+
