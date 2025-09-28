@@ -1,0 +1,86 @@
+import pandas as pd
+from surprise import Dataset, SVD, accuracy
+from surprise.model_selection import train_test_split, cross_validate
+import random
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+
+def get_movie_titles():
+    data_dir = os.path.expanduser('~') + '/.surprise_data/ml-100k/ml-100k/'
+    file_name = os.path.join(data_dir, 'u.item')
+    if not os.path.exists(file_name):
+        print("Error: u.item file not found. Run Dataset.load_builtin('ml-100k') first.")
+        return None
+    rid_to_name = {}
+    with open(file_name, 'r', encoding='ISO-8859-1') as f:
+        for line in f:
+            try:
+                parts = line.split('|')
+                rid_to_name[parts[0]] = parts[1]
+            except:
+                continue
+    return rid_to_name
+
+RANDOM_SEED = 42
+random.seed(RANDOM_SEED)
+np.random.seed(RANDOM_SEED)
+
+data = Dataset.load_builtin('ml-100k')
+rid_to_name = get_movie_titles()
+if rid_to_name is None:
+    exit()
+
+trainset, testset = train_test_split(data, test_size=0.25, random_state=RANDOM_SEED)
+algo = SVD(n_factors=100, n_epochs=20, random_state=RANDOM_SEED)
+algo.fit(trainset)
+
+predictions = algo.test(testset)
+accuracy.rmse(predictions, verbose=True)
+accuracy.mae(predictions, verbose=True)
+
+cv_results = cross_validate(algo, data, measures=['RMSE', 'MAE'], cv=5, verbose=True)
+
+rmse_scores = cv_results['test_rmse']
+mae_scores = cv_results['test_mae']
+folds = list(range(1, len(rmse_scores)+1))
+
+plt.figure(figsize=(10, 5))
+plt.plot(folds, rmse_scores, marker='o', label='RMSE')
+plt.plot(folds, mae_scores, marker='o', label='MAE')
+plt.title('Cross-Validation Performance')
+plt.xlabel('Fold')
+plt.ylabel('Error')
+plt.xticks(folds)
+plt.grid(True)
+plt.legend()
+plt.show()
+
+full_trainset = data.build_full_trainset()
+full_algo = SVD(n_factors=100, n_epochs=20, random_state=RANDOM_SEED).fit(full_trainset)
+
+def get_top_n_recommendations(user_id, all_items, trainset, model, n=5):
+    try:
+        user_inner_id = trainset.to_inner_uid(user_id)
+    except ValueError:
+        return []
+    rated_inner_items = [trainset.to_raw_iid(inner_iid) for (inner_iid, _) in trainset.ur[user_inner_id]]
+    unrated_items = [item for item in all_items if item not in rated_inner_items]
+    predictions = [model.predict(user_id, raw_iid) for raw_iid in unrated_items]
+    predictions.sort(key=lambda x: x.est, reverse=True)
+    return [(pred.iid, pred.est) for pred in predictions[:n]]
+
+all_raw_items = list(full_trainset.all_items())
+all_raw_iids = [full_trainset.to_raw_iid(inner_id) for inner_id in all_raw_items]
+
+target_user_id = '196'
+n_recommendations = 5
+recommendations = get_top_n_recommendations(target_user_id, all_raw_iids, full_trainset, full_algo, n=n_recommendations)
+
+recommendations_table = []
+for rank, (item_id, rating) in enumerate(recommendations, 1):
+    movie_title = rid_to_name.get(item_id, "Title Not Found")
+    recommendations_table.append([rank, movie_title, item_id, rating])
+
+df_recommendations = pd.DataFrame(recommendations_table, columns=["Rank", "Movie Title", "Item ID", "Predicted Rating"])
+print(df_recommendations)
